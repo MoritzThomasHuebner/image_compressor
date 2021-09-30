@@ -1,9 +1,10 @@
-from PIL import Image
-from PIL.ExifTags import TAGS
-import sys
+#!/usr/bin/env python
+
 import argparse
 import os
 from pathlib import Path
+
+from PIL import Image
 
 
 def compress(image_label, uncompressed_image_path, compressed_image_path, quality=80, overwrite=False):
@@ -14,11 +15,15 @@ def compress(image_label, uncompressed_image_path, compressed_image_path, qualit
         exif = im.info['exif']
         im.save(os.path.join(compressed_image_path, image_label), quality=quality, optimize=True, exif=exif)
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--uncompressed_dir", default="XT30", type=str)
 parser.add_argument("--compressed_dir", default="XT30_compressed", type=str)
 parser.add_argument("--quality", default=80, type=int)
+parser.add_argument("--overwrite", default="False", type=str)
 args = parser.parse_args()
+
+overwrite = args.overwrite == "True"
 
 
 for dirpath, _, filenames in os.walk(args.uncompressed_dir):
@@ -27,4 +32,4 @@ for dirpath, _, filenames in os.walk(args.uncompressed_dir):
     for filename in filenames:
         if filename[-4:].lower() == ".jpg" or filename[-5:].lower() == ".jpeg":
             compress(image_label=filename, uncompressed_image_path=dirpath,
-                     compressed_image_path=new_dir_path, quality=args.quality)
+                     compressed_image_path=new_dir_path, quality=args.quality, overwrite=overwrite)
